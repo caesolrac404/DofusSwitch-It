@@ -25,11 +25,16 @@ public sealed class WindowCycleService
 
     /// <summary>
     /// Re-enumera las ventanas (RF-6). Conserva el índice si la ventana actual sigue existiendo.
+    /// El orden es estable (título + HWND) porque el orden Z de EnumWindows cambia con cada
+    /// SetForegroundWindow y provocaba ping-pong en MoveNext (SPEC-003).
     /// </summary>
     public void Refresh()
     {
         var current = Current;
-        _windows = _enumerator.EnumerateDofusWindows().ToList();
+        _windows = _enumerator.EnumerateDofusWindows()
+            .OrderBy(w => w.Title, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(w => w.Hwnd)
+            .ToList();
         if (_windows.Count == 0)
         {
             _index = -1;

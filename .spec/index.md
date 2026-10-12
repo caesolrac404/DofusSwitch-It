@@ -8,6 +8,7 @@
 | — | [spec-template.md](spec-template.md) | Plantilla estándar SDD | — | Plantilla |
 | 001 | [001-window-detection-and-switching.md](001-window-detection-and-switching.md) | Detección de ventanas de Dofus y cambio cíclico (Core Loop) | `feature/001-window-detection` | En revisión |
 | 002 | [002-f2-f3-hotkeys-and-window-list.md](002-f2-f3-hotkeys-and-window-list.md) | Hotkeys F2/F3 y lista visible de ventanas de Dofus | `feature/002-f2-f3-hotkeys-and-window-list` | En curso |
+| 003 | [003-stable-cycle-order.md](003-stable-cycle-order.md) | Orden estable del ciclo (fix F3 ping-pong) | `feature/003-stable-cycle-order` | En curso |
 
 ## Próximas specs previstas (no creadas aún)
 
