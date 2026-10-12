@@ -16,7 +16,7 @@ public sealed class Win32WindowEnumerator : IWindowEnumerator
     }
 
     internal static bool DefaultPredicate(string title, uint processId) =>
-        title.Contains("Dofus", StringComparison.OrdinalIgnoreCase);
+        title.Contains("Release", StringComparison.OrdinalIgnoreCase);
 
     public IReadOnlyList<GameWindow> EnumerateDofusWindows()
     {
