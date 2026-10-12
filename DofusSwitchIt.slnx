@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DofusSwitchIt/DofusSwitchIt.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DofusSwitchIt.Tests/DofusSwitchIt.Tests.csproj" />
+  </Folder>
+</Solution>
