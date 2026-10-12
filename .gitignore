@@ -1,0 +1,22 @@
+# Binarios / build
+bin/
+obj/
+out/
+publish/
+TestResults/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+
+# NuGet
+*.nupkg
+*.snupkg
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
