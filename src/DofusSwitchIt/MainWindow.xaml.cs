@@ -1,35 +1,36 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Threading;
 using DofusSwitchIt.Core;
 using DofusSwitchIt.Native;
 
 namespace DofusSwitchIt;
 
 /// <summary>
-/// Ventana principal (SPEC-002): lista didáctica de ventanas Dofus + hotkeys globales F2/F3.
-/// Code-behind mínimo; la lógica vive en <see cref="WindowCycleService"/> (testeado).
+/// Tira delgada siempre visible (SPEC-005): lista numerada con drag &amp; drop, etiquetas F2/F3
+/// y botón de refresco con icono. Sin botones de texto. La lógica vive en
+/// <see cref="WindowCycleService"/> (testeado).
 /// </summary>
 public partial class MainWindow : Window
 {
+    private const string HwndFormat = "DofusSwitchIt.Hwnd";
+
     private WindowCycleService? _cycle;
     private IForegroundService? _foreground;
     private HotKeyRegistrar? _hotKeys;
     private readonly ObservableCollection<string> _items = new();
-    private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromSeconds(1) };
+
+    private nint? _dragHwnd;
+    private Point _dragStart;
 
     public MainWindow()
     {
         InitializeComponent();
         WindowList.ItemsSource = _items;
-        _timer.Tick += (_, _) => RefreshList();
-        Closed += (_, _) =>
-        {
-            _timer.Stop();
-            _hotKeys?.Dispose();
-        };
+        Closed += (_, _) => _hotKeys?.Dispose();
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -38,7 +39,7 @@ public partial class MainWindow : Window
 
         var enumerator = new Win32WindowEnumerator(
             (title, pid) => Win32WindowEnumerator.DefaultPredicate(title, pid)
-                            && pid != (uint)Environment.ProcessId); // excluir la propia app ("DofusSwitch-It" contiene "Dofus")
+                            && pid != (uint)Environment.ProcessId); // excluir la propia app
         _foreground = new Win32ForegroundService();
         _cycle = new WindowCycleService(enumerator, _foreground);
 
@@ -49,7 +50,6 @@ public partial class MainWindow : Window
         TryRegister(HotKeyDefaults.NextId, HotKeyDefaults.Modifiers, HotKeyDefaults.NextKey,
             "F3 (siguiente)", () => { _cycle.MoveNext(); RefreshList(); });
 
-        _timer.Start();
         RefreshList();
     }
 
@@ -61,7 +61,7 @@ public partial class MainWindow : Window
         }
         catch (Win32Exception ex)
         {
-            StatusText.Text += $" No se pudo registrar {label}: {ex.Message}. Los botones siguen funcionando.";
+            StatusText.Text += $" No se pudo registrar {label}: {ex.Message}.";
         }
     }
 
@@ -76,7 +76,7 @@ public partial class MainWindow : Window
         _items.Clear();
         if (windows.Count == 0)
         {
-            StatusText.Text = "No se detectaron ventanas de Dofus. Abre al menos un cliente del juego.";
+            StatusText.Text = "Sin ventanas. Abre un cliente.";
             return;
         }
 
@@ -87,46 +87,12 @@ public partial class MainWindow : Window
         WindowList.SelectedIndex = target is not null
             ? windows.ToList().FindIndex(w => w.Hwnd == target.Value)
             : -1;
-        StatusText.Text = $"{windows.Count} ventana(s) detectada(s). F2 = anterior, F3 = siguiente.";
-    }
-
-    private void PreviousButton_Click(object sender, RoutedEventArgs e)
-    {
-        _cycle?.MovePrevious();
-        RefreshList();
-    }
-
-    private void NextButton_Click(object sender, RoutedEventArgs e)
-    {
-        _cycle?.MoveNext();
-        RefreshList();
+        StatusText.Text = $"{windows.Count} ventana(s). Arrastra para ordenar.";
     }
 
     private void RefreshButton_Click(object sender, RoutedEventArgs e) => RefreshList();
 
-    private void MoveUpButton_Click(object sender, RoutedEventArgs e) => MoveSelected(-1);
-
-    private void MoveDownButton_Click(object sender, RoutedEventArgs e) => MoveSelected(+1);
-
-    private void MoveSelected(int delta)
-    {
-        if (_cycle is null || WindowList.SelectedIndex < 0)
-            return;
-
-        _cycle.Refresh();
-        if (WindowList.SelectedIndex >= _cycle.Windows.Count)
-            return;
-
-        var selected = _cycle.Windows[WindowList.SelectedIndex];
-        if (delta < 0)
-            _cycle.MoveUp(selected);
-        else
-            _cycle.MoveDown(selected);
-
-        RefreshList(selected.Hwnd); // la selección sigue al elemento movido
-    }
-
-    private void WindowList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void WindowList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         if (_cycle is null || _foreground is null || WindowList.SelectedIndex < 0)
             return;
@@ -135,5 +101,76 @@ public partial class MainWindow : Window
         if (WindowList.SelectedIndex < _cycle.Windows.Count)
             _foreground.BringToFront(_cycle.Windows[WindowList.SelectedIndex]);
         RefreshList();
+    }
+
+    private void WindowList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        _dragStart = e.GetPosition(WindowList);
+        _dragHwnd = GetHwndAtPoint(_dragStart);
+    }
+
+    private void WindowList_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (_dragHwnd is null || e.LeftButton != MouseButtonState.Pressed)
+            return;
+
+        var current = e.GetPosition(WindowList);
+        if (Math.Abs(current.X - _dragStart.X) < SystemParameters.MinimumHorizontalDragDistance
+            && Math.Abs(current.Y - _dragStart.Y) < SystemParameters.MinimumVerticalDragDistance)
+            return;
+
+        DragDrop.DoDragDrop(WindowList, new DataObject(HwndFormat, _dragHwnd.Value.ToInt64()),
+            DragDropEffects.Move);
+        _dragHwnd = null;
+    }
+
+    private void WindowList_DragOver(object sender, DragEventArgs e)
+    {
+        e.Effects = e.Data.GetDataPresent(HwndFormat) ? DragDropEffects.Move : DragDropEffects.None;
+        e.Handled = true;
+    }
+
+    private void WindowList_Drop(object sender, DragEventArgs e)
+    {
+        if (_cycle is null || !e.Data.GetDataPresent(HwndFormat))
+            return;
+
+        var hwnd = new nint((long)e.Data.GetData(HwndFormat)!);
+        var moved = _cycle.Windows.FirstOrDefault(w => w.Hwnd == hwnd);
+        if (moved is null)
+            return;
+
+        _cycle.Refresh();
+        moved = _cycle.Windows.FirstOrDefault(w => w.Hwnd == hwnd);
+        if (moved is null)
+            return;
+
+        _cycle.MoveTo(moved, GetIndexAtPoint(e.GetPosition(WindowList)));
+        RefreshList(hwnd);
+    }
+
+    private nint? GetHwndAtPoint(Point point)
+    {
+        if (_cycle is null)
+            return null;
+
+        int index = GetIndexAtPoint(point);
+        return index >= 0 && index < _cycle.Windows.Count ? _cycle.Windows[index].Hwnd : null;
+    }
+
+    private int GetIndexAtPoint(Point point)
+    {
+        if (_cycle is null)
+            return -1;
+
+        var element = WindowList.InputHitTest(point) as DependencyObject;
+        var container = element is not null
+            ? ItemsControl.ContainerFromElement(WindowList, element) as ListBoxItem
+            : null;
+
+        // Soltar bajo el último elemento = mover al final.
+        return container is not null
+            ? WindowList.ItemContainerGenerator.IndexFromContainer(container)
+            : _cycle.Windows.Count;
     }
 }
