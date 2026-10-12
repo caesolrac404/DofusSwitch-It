@@ -6,7 +6,8 @@
 | ID | Documento | Título | Rama | Estado |
 |----|-----------|--------|------|--------|
 | — | [spec-template.md](spec-template.md) | Plantilla estándar SDD | — | Plantilla |
-| 001 | [001-window-detection-and-switching.md](001-window-detection-and-switching.md) | Detección de ventanas de Dofus y cambio cíclico (Core Loop) | `feature/001-window-detection` | En curso |
+| 001 | [001-window-detection-and-switching.md](001-window-detection-and-switching.md) | Detección de ventanas de Dofus y cambio cíclico (Core Loop) | `feature/001-window-detection` | En revisión |
+| 002 | [002-f2-f3-hotkeys-and-window-list.md](002-f2-f3-hotkeys-and-window-list.md) | Hotkeys F2/F3 y lista visible de ventanas de Dofus | `feature/002-f2-f3-hotkeys-and-window-list` | En curso |
 
 ## Próximas specs previstas (no creadas aún)
 
