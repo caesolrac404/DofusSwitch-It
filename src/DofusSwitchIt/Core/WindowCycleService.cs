@@ -66,6 +66,28 @@ public sealed class WindowCycleService
     /// <summary>Baja una ventana en el orden del ciclo (SPEC-004). No-op en el último puesto.</summary>
     public void MoveDown(GameWindow window) => Move(window, +1);
 
+    /// <summary>
+    /// Mueve una ventana a una posición absoluta (SPEC-005, drag &amp; drop).
+    /// Índices fuera de rango hacen clamp; ventana inexistente = no-op.
+    /// </summary>
+    public void MoveTo(GameWindow window, int newIndex)
+    {
+        ArgumentNullException.ThrowIfNull(window);
+
+        int i = _windows.FindIndex(w => w.Hwnd == window.Hwnd);
+        if (i < 0 || _windows.Count == 0)
+            return;
+
+        var currentHwnd = Current?.Hwnd;
+        var item = _windows[i];
+        _windows.RemoveAt(i);
+        _windows.Insert(Math.Clamp(newIndex, 0, _windows.Count), item);
+
+        _index = currentHwnd is not null
+            ? _windows.FindIndex(w => w.Hwnd == currentHwnd.Value)
+            : -1;
+    }
+
     private void Move(GameWindow window, int delta)
     {
         ArgumentNullException.ThrowIfNull(window);

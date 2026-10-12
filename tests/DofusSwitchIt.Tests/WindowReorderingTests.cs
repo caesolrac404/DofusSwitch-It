@@ -90,4 +90,35 @@ public sealed class WindowReorderingTests
 
         sut.Current!.Hwnd.Should().Be((nint)2);
     }
+
+    [Fact] // T-17 / CA-1: MoveTo al inicio.
+    public void MoveTo_FirstPosition_Reorders()
+    {
+        var (sut, _) = CreateSut();
+
+        sut.MoveTo(sut.Windows[2], 0);
+
+        Order(sut).Should().Be("CAB");
+    }
+
+    [Fact] // T-17: MoveTo fuera de rango hace clamp al final.
+    public void MoveTo_OutOfRange_ClampsToEnd()
+    {
+        var (sut, _) = CreateSut();
+
+        sut.MoveTo(sut.Windows[0], 99);
+
+        Order(sut).Should().Be("BCA");
+    }
+
+    [Fact] // T-17: MoveTo con ventana inexistente es no-op y Current intacto.
+    public void MoveTo_UnknownWindow_IsNoOp_AndKeepsCurrent()
+    {
+        var (sut, _) = CreateSut();
+
+        sut.MoveTo(W(99, "Z"), 0);
+
+        Order(sut).Should().Be("ABC");
+        sut.Current!.Hwnd.Should().Be((nint)1);
+    }
 }
