@@ -65,7 +65,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void RefreshList()
+    private void RefreshList(nint? selectHwnd = null)
     {
         if (_cycle is null)
             return;
@@ -80,13 +80,13 @@ public partial class MainWindow : Window
             return;
         }
 
-        foreach (var w in windows)
-            _items.Add(w.Title);
+        for (int i = 0; i < windows.Count; i++)
+            _items.Add($"{i + 1}. {windows[i].Title}");
 
-        int current = _cycle.Current is not null
-            ? windows.ToList().FindIndex(w => w.Hwnd == _cycle.Current.Hwnd)
+        nint? target = selectHwnd ?? _cycle.Current?.Hwnd;
+        WindowList.SelectedIndex = target is not null
+            ? windows.ToList().FindIndex(w => w.Hwnd == target.Value)
             : -1;
-        WindowList.SelectedIndex = current;
         StatusText.Text = $"{windows.Count} ventana(s) detectada(s). F2 = anterior, F3 = siguiente.";
     }
 
@@ -103,6 +103,28 @@ public partial class MainWindow : Window
     }
 
     private void RefreshButton_Click(object sender, RoutedEventArgs e) => RefreshList();
+
+    private void MoveUpButton_Click(object sender, RoutedEventArgs e) => MoveSelected(-1);
+
+    private void MoveDownButton_Click(object sender, RoutedEventArgs e) => MoveSelected(+1);
+
+    private void MoveSelected(int delta)
+    {
+        if (_cycle is null || WindowList.SelectedIndex < 0)
+            return;
+
+        _cycle.Refresh();
+        if (WindowList.SelectedIndex >= _cycle.Windows.Count)
+            return;
+
+        var selected = _cycle.Windows[WindowList.SelectedIndex];
+        if (delta < 0)
+            _cycle.MoveUp(selected);
+        else
+            _cycle.MoveDown(selected);
+
+        RefreshList(selected.Hwnd); // la selección sigue al elemento movido
+    }
 
     private void WindowList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {

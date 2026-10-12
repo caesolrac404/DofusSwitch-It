@@ -24,29 +24,63 @@ public sealed class WindowCycleService
         _index >= 0 && _index < _windows.Count ? _windows[_index] : null;
 
     /// <summary>
-    /// Re-enumera las ventanas (RF-6). Conserva el índice si la ventana actual sigue existiendo.
-    /// El orden es estable (título + HWND) porque el orden Z de EnumWindows cambia con cada
-    /// SetForegroundWindow y provocaba ping-pong en MoveNext (SPEC-003).
+    /// Re-enumera las ventanas (RF-6). El orden manual es la fuente de verdad (SPEC-004):
+    /// conserva las posiciones existentes, elimina cerradas y agrega las nuevas al final.
+    /// El orden inicial es estable (título + HWND) porque el orden Z de EnumWindows cambia
+    /// con cada SetForegroundWindow y provocaba ping-pong en MoveNext (SPEC-003).
     /// </summary>
     public void Refresh()
     {
-        var current = Current;
-        _windows = _enumerator.EnumerateDofusWindows()
+        var currentHwnd = Current?.Hwnd;
+        var fresh = _enumerator.EnumerateDofusWindows()
             .OrderBy(w => w.Title, StringComparer.OrdinalIgnoreCase)
             .ThenBy(w => w.Hwnd)
             .ToList();
-        if (_windows.Count == 0)
+
+        if (fresh.Count == 0)
         {
+            _windows.Clear();
             _index = -1;
             return;
         }
 
-        _index = current is not null
-            ? _windows.FindIndex(w => w.Hwnd == current.Hwnd)
+        var freshByHwnd = fresh.ToDictionary(w => w.Hwnd);
+        var kept = _windows.Where(w => freshByHwnd.ContainsKey(w.Hwnd))
+            .Select(w => freshByHwnd[w.Hwnd])
+            .ToList();
+        var known = new HashSet<nint>(kept.Select(w => w.Hwnd));
+        kept.AddRange(fresh.Where(w => !known.Contains(w.Hwnd)));
+        _windows = kept;
+
+        _index = currentHwnd is not null
+            ? _windows.FindIndex(w => w.Hwnd == currentHwnd.Value)
             : -1;
 
         if (_index < 0)
             _index = 0;
+    }
+
+    /// <summary>Sube una ventana en el orden del ciclo (SPEC-004). No-op en el primer puesto.</summary>
+    public void MoveUp(GameWindow window) => Move(window, -1);
+
+    /// <summary>Baja una ventana en el orden del ciclo (SPEC-004). No-op en el último puesto.</summary>
+    public void MoveDown(GameWindow window) => Move(window, +1);
+
+    private void Move(GameWindow window, int delta)
+    {
+        ArgumentNullException.ThrowIfNull(window);
+
+        var currentHwnd = Current?.Hwnd;
+        int i = _windows.FindIndex(w => w.Hwnd == window.Hwnd);
+        int j = i + delta;
+        if (i < 0 || j < 0 || j >= _windows.Count)
+            return;
+
+        (_windows[i], _windows[j]) = (_windows[j], _windows[i]);
+
+        _index = currentHwnd is not null
+            ? _windows.FindIndex(w => w.Hwnd == currentHwnd.Value)
+            : -1;
     }
 
     /// <summary>Siguiente ventana (circular). No-op si no hay ventanas (RNF-4).</summary>
