@@ -12,7 +12,8 @@
 | 004 | [004-reorder-windows.md](004-reorder-windows.md) | Reordenamiento manual de ventanas (orden de turnos) | `feature/004-reorder-windows` | En revisión |
 | 005 | [005-minimal-ui.md](005-minimal-ui.md) | UI mínima (tira delgada siempre visible, drag & drop) | `feature/005-minimal-ui` | En revisión |
 | 006 | [006-compact-dark-ui.md](006-compact-dark-ui.md) | Widget compacto oscuro (chromeless, dark mode, minimalista) | `feature/006-compact-dark-ui` | En revisión |
-| 007 | [007-chrome-icon-position.md](007-chrome-icon-position.md) | Cromado mínimo (solo cerrar), icono y recordar posición | `feature/007-chrome-icon-position` | En curso |
+| 007 | [007-chrome-icon-position.md](007-chrome-icon-position.md) | Cromado mínimo (solo cerrar), icono y recordar posición | `feature/007-chrome-icon-position` | En revisión |
+| 008 | [008-help-and-labels.md](008-help-and-labels.md) | Etiquetas claras, ayuda integrada y textos +1px | `feature/008-help-and-labels` | En curso |
 
 ## Próximas specs previstas (no creadas aún)
 
