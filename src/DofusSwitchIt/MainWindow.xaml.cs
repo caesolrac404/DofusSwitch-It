@@ -25,6 +25,7 @@ public partial class MainWindow : Window
 
     private nint? _dragHwnd;
     private Point _dragStart;
+    private string _hotkeyWarning = "";
 
     public MainWindow()
     {
@@ -59,9 +60,9 @@ public partial class MainWindow : Window
         {
             _hotKeys!.Register(id, modifiers, key, () => Dispatcher.Invoke(handler));
         }
-        catch (Win32Exception ex)
+        catch (Win32Exception)
         {
-            StatusText.Text += $" No se pudo registrar {label}: {ex.Message}.";
+            _hotkeyWarning = " ⚠";
         }
     }
 
@@ -76,18 +77,18 @@ public partial class MainWindow : Window
         _items.Clear();
         if (windows.Count == 0)
         {
-            StatusText.Text = "Sin ventanas. Abre un cliente.";
+            StatusText.Text = "Sin ventanas" + _hotkeyWarning;
             return;
         }
 
         for (int i = 0; i < windows.Count; i++)
-            _items.Add($"{i + 1}. {windows[i].Title}");
+            _items.Add($"{i + 1}. {windows[i].DisplayName}");
 
         nint? target = selectHwnd ?? _cycle.Current?.Hwnd;
         WindowList.SelectedIndex = target is not null
             ? windows.ToList().FindIndex(w => w.Hwnd == target.Value)
             : -1;
-        StatusText.Text = $"{windows.Count} ventana(s). Arrastra para ordenar.";
+        StatusText.Text = $"{windows.Count} v." + _hotkeyWarning;
     }
 
     private void RefreshButton_Click(object sender, RoutedEventArgs e) => RefreshList();
