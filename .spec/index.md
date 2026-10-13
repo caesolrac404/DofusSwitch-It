@@ -10,7 +10,8 @@
 | 002 | [002-f2-f3-hotkeys-and-window-list.md](002-f2-f3-hotkeys-and-window-list.md) | Hotkeys F2/F3 y lista visible de ventanas de Dofus | `feature/002-f2-f3-hotkeys-and-window-list` | Completada |
 | 003 | [003-stable-cycle-order.md](003-stable-cycle-order.md) | Orden estable del ciclo (fix F3 ping-pong) | `feature/003-stable-cycle-order` | Completada |
 | 004 | [004-reorder-windows.md](004-reorder-windows.md) | Reordenamiento manual de ventanas (orden de turnos) | `feature/004-reorder-windows` | En revisión |
-| 005 | [005-minimal-ui.md](005-minimal-ui.md) | UI mínima (tira delgada siempre visible, drag & drop) | `feature/005-minimal-ui` | En curso |
+| 005 | [005-minimal-ui.md](005-minimal-ui.md) | UI mínima (tira delgada siempre visible, drag & drop) | `feature/005-minimal-ui` | En revisión |
+| 006 | [006-compact-dark-ui.md](006-compact-dark-ui.md) | Widget compacto oscuro (chromeless, dark mode, minimalista) | `feature/006-compact-dark-ui` | En curso |
 
 ## Próximas specs previstas (no creadas aún)
 
