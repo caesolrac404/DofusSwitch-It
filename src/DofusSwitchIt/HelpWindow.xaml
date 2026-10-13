@@ -1,0 +1,27 @@
+<Window x:Class="DofusSwitchIt.HelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DS-I · Ayuda" Width="300" Height="400"
+        ResizeMode="NoResize" Background="#1E1E1E" Foreground="#D8D8D8">
+    <ScrollViewer Margin="12" VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+            <TextBlock FontSize="14" FontWeight="Bold" Margin="0,0,0,8" Text="DofusSwitch-It" />
+            <TextBlock FontSize="13" TextWrapping="Wrap" Margin="0,0,0,4"
+                       Text="Rota entre tus cuentas de Dofus sin Alt+Tab." />
+            <TextBlock FontSize="13" TextWrapping="Wrap" Margin="0,8,0,2" FontWeight="Bold" Text="Atajos globales" />
+            <TextBlock FontSize="13" TextWrapping="Wrap" Text="• F2: ventana anterior (funciona con otra app enfocada)." />
+            <TextBlock FontSize="13" TextWrapping="Wrap" Text="• F3: ventana siguiente." />
+            <TextBlock FontSize="13" TextWrapping="Wrap" Margin="0,8,0,2" FontWeight="Bold" Text="Lista" />
+            <TextBlock FontSize="13" TextWrapping="Wrap" Text="• Muestra tus pjs. en orden de turnos (1., 2., …)." />
+            <TextBlock FontSize="13" TextWrapping="Wrap" Text="• Arrastra para reordenar." />
+            <TextBlock FontSize="13" TextWrapping="Wrap" Text="• Doble clic para llevar un pj. al frente." />
+            <TextBlock FontSize="13" TextWrapping="Wrap" Margin="0,8,0,2" FontWeight="Bold" Text="Barra inferior" />
+            <TextBlock FontSize="13" TextWrapping="Wrap" Text="• N pjs.: cuentas detectadas." />
+            <TextBlock FontSize="13" TextWrapping="Wrap" Text="• ⟳: refrescar la lista." />
+            <TextBlock FontSize="13" TextWrapping="Wrap" Text="• ?: esta ayuda." />
+            <TextBlock FontSize="13" TextWrapping="Wrap" Margin="0,8,0,2" FontWeight="Bold" Text="Ventana" />
+            <TextBlock FontSize="13" TextWrapping="Wrap" Text="• Siempre visible y recuerda su posición." />
+            <TextBlock FontSize="13" TextWrapping="Wrap" Text="• Si un pj. está minimizado, se restaura al enfocarlo." />
+        </StackPanel>
+    </ScrollViewer>
+</Window>

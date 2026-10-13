@@ -35,18 +35,25 @@
     </Window.Resources>
     <DockPanel Margin="8">
         <Grid DockPanel.Dock="Top" Margin="0,0,0,6">
-            <TextBlock FontSize="11" Foreground="{StaticResource Dim}"
-                       HorizontalAlignment="Left" Text="F2 ◀" />
-            <TextBlock FontSize="11" Foreground="{StaticResource Dim}"
+            <TextBlock FontSize="12" Foreground="{StaticResource Dim}"
+                       HorizontalAlignment="Left" Text="◀ F2" />
+            <TextBlock FontSize="12" Foreground="{StaticResource Dim}"
                        HorizontalAlignment="Right" Text="F3 ▶" />
         </Grid>
-        <DockPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
-            <Button DockPanel.Dock="Right" x:Name="RefreshButton" Content="⟳" Width="28" FontSize="13"
-                    ToolTip="Refrescar" Click="RefreshButton_Click" />
-            <TextBlock x:Name="StatusText" FontSize="11" Foreground="{StaticResource Dim}"
+        <Grid DockPanel.Dock="Bottom" Margin="0,6,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" x:Name="StatusText" FontSize="12" Foreground="{StaticResource Dim}"
                        VerticalAlignment="Center" Text="…" />
-        </DockPanel>
-        <ListBox x:Name="WindowList" AllowDrop="True"
+            <Button Grid.Column="1" x:Name="HelpButton" Content="?" Width="26" FontSize="13"
+                    HorizontalAlignment="Center" ToolTip="Ayuda" Click="HelpButton_Click" />
+            <Button Grid.Column="2" x:Name="RefreshButton" Content="⟳" Width="28" FontSize="14"
+                    ToolTip="Refrescar" Click="RefreshButton_Click" />
+        </Grid>
+        <ListBox x:Name="WindowList" AllowDrop="True" FontSize="13"
                  Background="{StaticResource Panel}" Foreground="{StaticResource Fg}"
                  BorderBrush="{StaticResource Border}" BorderThickness="1"
                  ToolTip="Arrastra para ordenar. Doble clic para enfocar."

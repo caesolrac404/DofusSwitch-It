@@ -97,7 +97,7 @@ public partial class MainWindow : Window
         _items.Clear();
         if (windows.Count == 0)
         {
-            StatusText.Text = "Sin ventanas" + _hotkeyWarning;
+            StatusText.Text = "0 pjs." + _hotkeyWarning;
             return;
         }
 
@@ -108,10 +108,13 @@ public partial class MainWindow : Window
         WindowList.SelectedIndex = target is not null
             ? windows.ToList().FindIndex(w => w.Hwnd == target.Value)
             : -1;
-        StatusText.Text = $"{windows.Count} v." + _hotkeyWarning;
+        StatusText.Text = $"{windows.Count} pjs." + _hotkeyWarning;
     }
 
     private void RefreshButton_Click(object sender, RoutedEventArgs e) => RefreshList();
+
+    private void HelpButton_Click(object sender, RoutedEventArgs e) =>
+        new HelpWindow { Owner = this }.Show();
 
     private void WindowList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
