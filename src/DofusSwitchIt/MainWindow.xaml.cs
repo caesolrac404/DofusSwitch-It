@@ -30,9 +30,29 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        RestorePosition();
         WindowList.ItemsSource = _items;
-        Closed += (_, _) => _hotKeys?.Dispose();
+        Closed += (_, _) =>
+        {
+            new WindowPlacementStore().Save(new WindowPlacement(Left, Top));
+            _hotKeys?.Dispose();
+        };
     }
+
+    private void RestorePosition()
+    {
+        var placement = new WindowPlacementStore().Load();
+        if (placement is null || !IsOnScreen(placement))
+            return;
+        Left = placement.Left;
+        Top = placement.Top;
+    }
+
+    private static bool IsOnScreen(WindowPlacement p) =>
+        p.Left >= SystemParameters.VirtualScreenLeft
+        && p.Top >= SystemParameters.VirtualScreenTop
+        && p.Left < SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth
+        && p.Top < SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight;
 
     protected override void OnSourceInitialized(EventArgs e)
     {

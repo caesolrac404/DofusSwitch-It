@@ -1,8 +1,9 @@
 ﻿<Window x:Class="DofusSwitchIt.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Dofus Switcher" Height="210" Width="230" MinWidth="180" MinHeight="160"
-        ResizeMode="CanMinimize" Topmost="True"
+        Title="DS-I" Height="210" Width="172"
+        ResizeMode="NoResize" Topmost="True" WindowStartupLocation="Manual"
+        Icon="Logo/DofusSwitch-It.ico"
         Background="#1E1E1E" Foreground="#D8D8D8">
     <Window.Resources>
         <SolidColorBrush x:Key="Panel" Color="#252526" />
