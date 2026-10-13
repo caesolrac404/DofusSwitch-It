@@ -1,7 +1,7 @@
 ﻿<Window x:Class="DofusSwitchIt.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="DS-I" Height="210" Width="172"
+        Title="DofusSwitch-It" Height="210" Width="172"
         ResizeMode="NoResize" Topmost="True" WindowStartupLocation="Manual"
         Icon="Logo/DofusSwitch-It.ico"
         Background="#1E1E1E" Foreground="#D8D8D8">
@@ -12,6 +12,7 @@
         <SolidColorBrush x:Key="Dim" Color="#9A9A9A" />
         <SolidColorBrush x:Key="Sel" Color="#37373D" />
         <SolidColorBrush x:Key="Hover" Color="#2D2D30" />
+        <SolidColorBrush x:Key="BtnLight" Color="#3E3E42" />
         <Style TargetType="ListBoxItem">
             <Setter Property="Padding" Value="6,3" />
             <Setter Property="Foreground" Value="{StaticResource Fg}" />
@@ -35,10 +36,10 @@
     </Window.Resources>
     <DockPanel Margin="8">
         <Grid DockPanel.Dock="Top" Margin="0,0,0,6">
-            <TextBlock FontSize="12" Foreground="{StaticResource Dim}"
-                       HorizontalAlignment="Left" Text="◀ F2" />
-            <TextBlock FontSize="12" Foreground="{StaticResource Dim}"
-                       HorizontalAlignment="Right" Text="F3 ▶" />
+            <TextBlock FontSize="12" FontWeight="Bold" Foreground="{StaticResource Dim}"
+                       HorizontalAlignment="Left" Text="▲ F2" />
+            <TextBlock FontSize="12" FontWeight="Bold" Foreground="{StaticResource Dim}"
+                       HorizontalAlignment="Right" Text="F3 ▼" />
         </Grid>
         <Grid DockPanel.Dock="Bottom" Margin="0,6,0,0">
             <Grid.ColumnDefinitions>
@@ -46,11 +47,13 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" x:Name="StatusText" FontSize="12" Foreground="{StaticResource Dim}"
+            <TextBlock Grid.Column="0" x:Name="StatusText" FontSize="12" FontWeight="Bold" Foreground="{StaticResource Dim}"
                        VerticalAlignment="Center" Text="…" />
-            <Button Grid.Column="1" x:Name="HelpButton" Content="?" Width="26" FontSize="13"
+            <Button Grid.Column="1" x:Name="HelpButton" Content="?" Width="26" FontSize="13" FontWeight="Bold"
+                    Background="{StaticResource BtnLight}"
                     HorizontalAlignment="Center" ToolTip="Ayuda" Click="HelpButton_Click" />
-            <Button Grid.Column="2" x:Name="RefreshButton" Content="⟳" Width="28" FontSize="14"
+            <Button Grid.Column="2" x:Name="RefreshButton" Content="⟳" Width="28" FontSize="14" FontWeight="Bold"
+                    Background="{StaticResource BtnLight}"
                     ToolTip="Refrescar" Click="RefreshButton_Click" />
         </Grid>
         <ListBox x:Name="WindowList" AllowDrop="True" FontSize="13"

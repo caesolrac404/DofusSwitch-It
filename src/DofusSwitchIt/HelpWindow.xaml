@@ -4,7 +4,7 @@
         Title="DS-I · Ayuda" Width="300" Height="400"
         ResizeMode="NoResize" Background="#1E1E1E" Foreground="#D8D8D8">
     <ScrollViewer Margin="12" VerticalScrollBarVisibility="Auto">
-        <StackPanel>
+        <StackPanel TextBlock.FontWeight="Bold">
             <TextBlock FontSize="14" FontWeight="Bold" Margin="0,0,0,8" Text="DofusSwitch-It" />
             <TextBlock FontSize="13" TextWrapping="Wrap" Margin="0,0,0,4"
                        Text="Rota entre tus cuentas de Dofus sin Alt+Tab." />

@@ -26,6 +26,7 @@ public partial class MainWindow : Window
     private nint? _dragHwnd;
     private Point _dragStart;
     private string _hotkeyWarning = "";
+    private HelpWindow? _help;
 
     public MainWindow()
     {
@@ -113,8 +114,21 @@ public partial class MainWindow : Window
 
     private void RefreshButton_Click(object sender, RoutedEventArgs e) => RefreshList();
 
-    private void HelpButton_Click(object sender, RoutedEventArgs e) =>
-        new HelpWindow { Owner = this }.Show();
+    private void HelpButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_help is null)
+        {
+            _help = new HelpWindow { Owner = this };
+            _help.Closed += (_, _) => _help = null;
+            _help.Show();
+        }
+        else
+        {
+            if (_help.WindowState == WindowState.Minimized)
+                _help.WindowState = WindowState.Normal;
+            _help.Activate();
+        }
+    }
 
     private void WindowList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
