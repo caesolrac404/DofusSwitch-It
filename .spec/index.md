@@ -14,7 +14,8 @@
 | 006 | [006-compact-dark-ui.md](006-compact-dark-ui.md) | Widget compacto oscuro (chromeless, dark mode, minimalista) | `feature/006-compact-dark-ui` | En revisión |
 | 007 | [007-chrome-icon-position.md](007-chrome-icon-position.md) | Cromado mínimo (solo cerrar), icono y recordar posición | `feature/007-chrome-icon-position` | En revisión |
 | 008 | [008-help-and-labels.md](008-help-and-labels.md) | Etiquetas claras, ayuda integrada y textos +1px | `feature/008-help-and-labels` | En revisión |
-| 009 | [009-header-help-polish.md](009-header-help-polish.md) | Pulido de cabecera, ayuda singleton y negritas | `feature/009-header-help-polish` | En curso |
+| 009 | [009-header-help-polish.md](009-header-help-polish.md) | Pulido de cabecera, ayuda singleton y negritas | `feature/009-header-help-polish` | En revisión |
+| 010 | [010-detection-predicate.md](010-detection-predicate.md) | Predicado de detección por versión (regex generado + tests) | `feature/010-detection-predicate` | En curso |
 
 ## Próximas specs previstas (no creadas aún)
 
