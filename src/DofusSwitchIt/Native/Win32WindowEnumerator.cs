@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using DofusSwitchIt.Core;
 
 namespace DofusSwitchIt.Native;
@@ -6,17 +7,30 @@ namespace DofusSwitchIt.Native;
 /// Implementación real de <see cref="IWindowEnumerator"/> con EnumWindows (RF-1).
 /// El predicado de "es ventana Dofus" es inyectable para validar con Spy++ (SPEC-001 riesgo abierto).
 /// </summary>
-public sealed class Win32WindowEnumerator : IWindowEnumerator
+public sealed partial class Win32WindowEnumerator : IWindowEnumerator
 {
     private readonly Func<string, uint, bool> _isDofusWindow;
+
+    // Regex generado para encontrar las ventanas de Dofus: versión de 3-4 partes + "- Release" al final.
+    [GeneratedRegex(@"\d+(\.\d+){2,3}\s*-\s*Release\s*$", RegexOptions.IgnoreCase)]
+    private static partial Regex DofusPattern();
 
     public Win32WindowEnumerator(Func<string, uint, bool>? isDofusWindow = null)
     {
         _isDofusWindow = isDofusWindow ?? DefaultPredicate;
     }
 
-    internal static bool DefaultPredicate(string title, uint processId) =>
-        title.Contains("Release", StringComparison.OrdinalIgnoreCase);
+    /// <summary>
+    /// Predicado por defecto: título con versión de 3-4 partes + "- Release" al final.
+    /// Público para poder cubrirlo con unit tests (SPEC-010).
+    /// </summary>
+    public static bool DefaultPredicate(string title, uint processId)
+    {   
+        if (string.IsNullOrWhiteSpace(title))
+            return false;
+
+        return DofusPattern().IsMatch(title);
+    }
 
     public IReadOnlyList<GameWindow> EnumerateDofusWindows()
     {
