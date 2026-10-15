@@ -32,10 +32,7 @@ public sealed class WindowCycleService
     public void Refresh()
     {
         var currentHwnd = Current?.Hwnd;
-        var fresh = _enumerator.EnumerateDofusWindows()
-            .OrderBy(w => w.Title, StringComparer.OrdinalIgnoreCase)
-            .ThenBy(w => w.Hwnd)
-            .ToList();
+        var fresh = FetchOrdered();
 
         if (fresh.Count == 0)
         {
@@ -44,18 +41,36 @@ public sealed class WindowCycleService
             return;
         }
 
+        _windows = Reconcile(fresh);
+        ResyncIndex(currentHwnd);
+    }
+
+    /// <summary>Enumera las ventanas en el orden inicial estable (título + HWND).</summary>
+    private List<GameWindow> FetchOrdered() =>
+        _enumerator.EnumerateDofusWindows()
+            .OrderBy(w => w.Title, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(w => w.Hwnd)
+            .ToList();
+
+    /// <summary>Conserva el orden manual, descarta cerradas y agrega las nuevas al final.</summary>
+    private List<GameWindow> Reconcile(List<GameWindow> fresh)
+    {
         var freshByHwnd = fresh.ToDictionary(w => w.Hwnd);
-        var kept = _windows.Where(w => freshByHwnd.ContainsKey(w.Hwnd))
+        var kept = _windows
+            .Where(w => freshByHwnd.ContainsKey(w.Hwnd))
             .Select(w => freshByHwnd[w.Hwnd])
             .ToList();
         var known = new HashSet<nint>(kept.Select(w => w.Hwnd));
         kept.AddRange(fresh.Where(w => !known.Contains(w.Hwnd)));
-        _windows = kept;
+        return kept;
+    }
 
-        _index = currentHwnd is not null
-            ? _windows.FindIndex(w => w.Hwnd == currentHwnd.Value)
-            : -1;
+    private int IndexOf(nint hwnd) => _windows.FindIndex(w => w.Hwnd == hwnd);
 
+    /// <summary>Tras un Refresh: sincroniza el índice con la ventana actual, o cae al primero.</summary>
+    private void ResyncIndex(nint? currentHwnd)
+    {
+        _index = currentHwnd is not null ? IndexOf(currentHwnd.Value) : -1;
         if (_index < 0)
             _index = 0;
     }
@@ -74,8 +89,8 @@ public sealed class WindowCycleService
     {
         ArgumentNullException.ThrowIfNull(window);
 
-        int i = _windows.FindIndex(w => w.Hwnd == window.Hwnd);
-        if (i < 0 || _windows.Count == 0)
+        int i = IndexOf(window.Hwnd);
+        if (i < 0)
             return;
 
         var currentHwnd = Current?.Hwnd;
@@ -83,9 +98,7 @@ public sealed class WindowCycleService
         _windows.RemoveAt(i);
         _windows.Insert(Math.Clamp(newIndex, 0, _windows.Count), item);
 
-        _index = currentHwnd is not null
-            ? _windows.FindIndex(w => w.Hwnd == currentHwnd.Value)
-            : -1;
+        SyncIndexAfterMove(currentHwnd);
     }
 
     private void Move(GameWindow window, int delta)
@@ -93,17 +106,19 @@ public sealed class WindowCycleService
         ArgumentNullException.ThrowIfNull(window);
 
         var currentHwnd = Current?.Hwnd;
-        int i = _windows.FindIndex(w => w.Hwnd == window.Hwnd);
+        int i = IndexOf(window.Hwnd);
         int j = i + delta;
         if (i < 0 || j < 0 || j >= _windows.Count)
             return;
 
         (_windows[i], _windows[j]) = (_windows[j], _windows[i]);
 
-        _index = currentHwnd is not null
-            ? _windows.FindIndex(w => w.Hwnd == currentHwnd.Value)
-            : -1;
+        SyncIndexAfterMove(currentHwnd);
     }
+
+    /// <summary>Mantiene Current apuntando a la misma ventana (por Hwnd) tras un reordenamiento.</summary>
+    private void SyncIndexAfterMove(nint? currentHwnd) =>
+        _index = currentHwnd is not null ? IndexOf(currentHwnd.Value) : -1;
 
     /// <summary>Siguiente ventana (circular). No-op si no hay ventanas (RNF-4).</summary>
     public bool MoveNext()

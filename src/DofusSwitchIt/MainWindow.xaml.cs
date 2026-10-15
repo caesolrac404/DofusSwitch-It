@@ -49,11 +49,11 @@ public partial class MainWindow : Window
         Top = placement.Top;
     }
 
-    private static bool IsOnScreen(WindowPlacement p) =>
-        p.Left >= SystemParameters.VirtualScreenLeft
-        && p.Top >= SystemParameters.VirtualScreenTop
-        && p.Left < SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth
-        && p.Top < SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight;
+    private static bool IsOnScreen(WindowPlacement placement) =>
+        placement.Left >= SystemParameters.VirtualScreenLeft
+        && placement.Top >= SystemParameters.VirtualScreenTop
+        && placement.Left < SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth
+        && placement.Top < SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight;
 
     protected override void OnSourceInitialized(EventArgs e)
     {
@@ -174,17 +174,22 @@ public partial class MainWindow : Window
             return;
 
         var hwnd = new nint((long)e.Data.GetData(HwndFormat)!);
-        var moved = _cycle.Windows.FirstOrDefault(w => w.Hwnd == hwnd);
-        if (moved is null)
-            return;
-
-        _cycle.Refresh();
-        moved = _cycle.Windows.FirstOrDefault(w => w.Hwnd == hwnd);
-        if (moved is null)
+        if (!TryGetDroppedWindow(hwnd, out var moved))
             return;
 
         _cycle.MoveTo(moved, GetIndexAtPoint(e.GetPosition(WindowList)));
         RefreshList(hwnd);
+    }
+
+    /// <summary>Refresca y re-resuelve la ventana arrastrada; false si ya no existe.</summary>
+    private bool TryGetDroppedWindow(nint hwnd, out GameWindow window)
+    {
+        ArgumentNullException.ThrowIfNull(_cycle);
+        _cycle.Refresh();
+
+        var found = _cycle.Windows.FirstOrDefault(w => w.Hwnd == hwnd);
+        window = found!;
+        return found is not null;
     }
 
     private nint? GetHwndAtPoint(Point point)
