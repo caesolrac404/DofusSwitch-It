@@ -13,13 +13,17 @@ cambiar de forma ultrarrápida y cíclica entre las ventanas abiertas del juego 
 ```
 AGENT.md                  # Directrices obligatorias del agente (stack, Win32, SDD, tests)
 .spec/
-  index.md                # Índice y estado de especificaciones
+  index.md                # Índice y estado de especificaciones (001–012)
   spec-template.md        # Plantilla SDD para nuevas features
-  001-window-detection-and-switching.md   # Core Loop: detección + cambio cíclico
+  001..012-*.md           # Una spec por funcionalidad (ver index.md)
+.agents/skills/           # Skills de agente instaladas (code-review, clean-code)
+skills-lock.json          # Versiones/registro de las skills instaladas
 DofusSwitchIt.slnx        # Solución (formato .slnx, SDK .NET 10)
 src/DofusSwitchIt/        # App WPF (net10.0-windows)
-  Core/                   # Lógica pura testeable: GameWindow, WindowCycleService, interfaces
-  Native/                 # P/Invoke: NativeMethods, Win32WindowEnumerator, Win32ForegroundService, HotKeyRegistrar
+  Core/                   # Lógica pura testeable (WindowCycleService, stores, modelos)
+  Native/                 # P/Invoke: NativeMethods, Win32WindowEnumerator/Foreground, HotKeyRegistrar
+  Logo/                   # DofusSwitch-It.ico (icono de app)
+  MainWindow / HelpWindow # UI del widget y ventana de ayuda
 tests/DofusSwitchIt.Tests/  # Tests xUnit (net10.0-windows, sin APIs WPF)
 ```
 
@@ -43,8 +47,35 @@ O abrir `DofusSwitchIt.slnx` en Visual Studio 2026+ y pulsar `F5`.
 dotnet test DofusSwitchIt.slnx
 ```
 
-Incluye tests del ciclo siguiente/anterior circular, no-op sin ventanas y refresco
-de la lista (SPEC-001, criterios CA-1/CA-2/CA-3/CA-5).
+Incluye tests del ciclo siguiente/anterior circular, no-op sin ventanas, orden estable,
+reordenamiento por arrastre, persistencia de posición y del predicado de detección.
+
+## Skills del agente
+
+El repo incluye skills de agente gestionadas por la CLI `skills` y registradas en
+`skills-lock.json` (carpeta `.agents/skills/`):
+
+| Skill | Para qué sirve |
+|-------|----------------|
+| `code-review` | Revisa el diff de una rama en dos ejes — **Standards** (¿respeta las normas del repo?) y **Spec** (¿implementa lo que pedía la spec?) — con dos sub-agentes en paralelo, y reporta ambos lados por separado. |
+| `clean-code` | Principios de Clean Code (Martin): nombres, funciones pequeñas, comentarios útiles, smells. |
+
+### Cómo usar `code-review`
+
+Se invoca en el chat pasando el punto fijo (commit, rama, tag o `HEAD~N`) desde el que comparar:
+
+```
+review since main
+review since feature/010-detection-predicate
+```
+
+La skill ejecuta `git diff <punto-fijo>...HEAD` y lanza dos sub-agentes: uno valida el
+**Standards** (contra `AGENT.md` y el baseline de smells de Fowler) y otro el **Spec**.
+> Nota: la spec origen de este proyecto vive en **`.spec/`** (no en `docs/`, `specs/` ni
+> `.scratch/`); indica la spec concreta si la skill pide dónde encontrarla (ej. `.spec/012-...md`).
+
+Conclusión esperada: ambas listas de hallazgos lado a lado, sin mezclarlas, más un resumen
+de una línea por eje.
 
 ## Flujo de ramas Git por especificación (obligatorio)
 
@@ -59,3 +90,6 @@ de la lista (SPEC-001, criterios CA-1/CA-2/CA-3/CA-5).
    git push -u origin feature/001-window-detection
    ```
 4. Abrir PR hacia `main` referenciando la spec. Convención de commits: `<id>: <descripción>` (ej. `001: add cyclic window switcher service + tests`).
+5. **Antes del `push`/PR**, ejecutar el skill `code-review` contra el punto fijo de la rama
+   (ej. `review since main` apuntando a `.spec/<id>-<slug>.md`) y resolver los hallazgos del eje
+   Standards y del eje Spec (ver [Skills del agente](#skills-del-agente)).

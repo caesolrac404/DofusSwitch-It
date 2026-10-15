@@ -59,7 +59,12 @@ internal static partial class NativeMethods
    ```
    El `<id>` y `<slug>` deben coincidir con el nombre del archivo de spec (ej. `.spec/001-window-detection-and-switching.md` → `feature/001-window-detection` o `feature/001-window-detection-and-switching`).
 2. **Todo el código y pruebas de la spec viven en su rama.** Prohibido mezclar dos specs en una misma rama o commitear a `main` directamente.
-3. **Al finalizar**, subir la rama con `git push -u origin <rama>` y abrir PR hacia `main` referenciando la spec.
+3. **Al finalizar**, ejecutar el skill **`code-review`** sobre el diff de la rama
+   (`review since main`, indicando la spec en `.spec/<id>-<slug>.md`), resolver los hallazgos de
+   ambos ejes (Standards y Spec), y luego subir la rama con `git push -u origin <rama>` y abrir
+   PR hacia `main` referenciando la spec.
+   > Skills disponibles del agente: `code-review` y `clean-code`, en `.agents/skills/`
+   > (registradas en `skills-lock.json`). Ver la sección "Skills del agente" del `README.md`.
 4. **Estado de la spec** en `.spec/index.md` debe actualizarse en la misma rama (`Borrador → En curso → En revisión → Completada`).
 5. **Convención de commits:** `<id>: <descripción corta>` (ej. `001: add cyclic window switcher service + tests`).
 
