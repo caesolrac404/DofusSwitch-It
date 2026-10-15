@@ -16,9 +16,11 @@
 | 008 | [008-help-and-labels.md](008-help-and-labels.md) | Etiquetas claras, ayuda integrada y textos +1px | `feature/008-help-and-labels` | En revisión |
 | 009 | [009-header-help-polish.md](009-header-help-polish.md) | Pulido de cabecera, ayuda singleton y negritas | `feature/009-header-help-polish` | En revisión |
 | 010 | [010-detection-predicate.md](010-detection-predicate.md) | Predicado de detección por versión (regex generado + tests) | `feature/010-detection-predicate` | En revisión |
-| 011 | [011-clean-code-hygiene.md](011-clean-code-hygiene.md) | Higiene Clean Code (refactor sin cambio de comportamiento) | `feature/011-clean-code-hygiene` | En curso |
+| 011 | [011-clean-code-hygiene.md](011-clean-code-hygiene.md) | Higiene Clean Code (refactor sin cambio de comportamiento) | `feature/011-clean-code-hygiene` | En revisión |
+| 012 | [012-docs-code-review-skill.md](012-docs-code-review-skill.md) | Documentar las skills del agente (code-review) en README y AGENT | `feature/012-docs-code-review-skill` | En curso |
 
 ## Próximas specs previstas (no creadas aún)
 
-- `002` — Configuración de hotkeys personalizados + persistencia.
-- `003` — Indicador visual / overlay del índice actual del ciclo.
+- Hotkeys personalizables por el usuario (persistencia de configuración).
+- Overlay/indicador del índice actual del ciclo.
+- Instalador y auto-arranque con Windows.
